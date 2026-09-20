@@ -12,16 +12,16 @@
 </head>
 <body>
 <div class="wrap">
- <div class="top"><div><div class="eyebrow">American League • Wild Card Watch</div><h1>Blue Jays Wild Card Tracker</h1><div class="sub">Live Toronto playoff race, with Cleveland tracked separately.</div><div class="statusline" id="updated">Loading MLB data…</div></div><button id="refresh">Refresh now</button></div>
+ <div class="top"><div><div class="eyebrow">American League • Wild Card Watch</div><h1>Blue Jays Wild Card Tracker</h1><div class="sub">Live Toronto playoff race, automatically tracking the current WC3 team.</div><div class="statusline" id="updated">Loading MLB data…</div></div><button id="refresh">Refresh now</button></div>
  <div id="error" class="error"></div>
 
  <div class="grid2">
   <div class="card"><div class="teamhead"><div><div class="badge">TOR</div><div class="team">Toronto Blue Jays</div><div class="muted">AL East</div></div><div class="record" id="tor-record">—</div></div><div class="kpis"><div class="kpi"><span class="muted">WC3 GB</span><b id="tor-gb">—</b></div><div class="kpi"><span class="muted">Games left</span><b id="tor-left">—</b></div><div class="kpi"><span class="muted">Last 14 days</span><b id="tor-form">—</b></div></div></div>
-  <div class="card"><div class="teamhead"><div><div class="badge">CLE</div><div class="team">Cleveland Guardians</div><div class="muted">AL Central</div></div><div class="record" id="cle-record">—</div></div><div class="kpis"><div class="kpi"><span class="muted">Division status</span><b id="cle-div">—</b></div><div class="kpi"><span class="muted">Games left</span><b id="cle-left">—</b></div><div class="kpi"><span class="muted">Last 14 days</span><b id="cle-form">—</b></div></div></div>
+  <div class="card"><div class="teamhead"><div><div class="badge" id="wc3-badge">WC3</div><div class="team" id="wc3-team">Current WC3</div><div class="muted" id="wc3-division">American League</div></div><div class="record" id="wc3-record">—</div></div><div class="kpis"><div class="kpi"><span class="muted">Wild Card spot</span><b>WC3</b></div><div class="kpi"><span class="muted">Games left</span><b id="wc3-left">—</b></div><div class="kpi"><span class="muted">Last 14 days</span><b id="wc3-form">—</b></div></div></div>
  </div>
 
  <div class="grid2">
-  <div class="card"><div class="sectiontitle"><h2>Today</h2><span class="muted">live / final</span></div><div class="scoregrid"><div class="score"><div class="muted">Toronto</div><b id="tor-score">—</b><div id="tor-opp" class="muted">Loading…</div><div id="tor-status"></div></div><div class="score"><div class="muted">Cleveland</div><b id="cle-score">—</b><div id="cle-opp" class="muted">Loading…</div><div id="cle-status"></div></div></div></div>
+  <div class="card"><div class="sectiontitle"><h2>Today</h2><span class="muted">live / final</span></div><div class="scoregrid"><div class="score"><div class="muted">Toronto</div><b id="tor-score">—</b><div id="tor-opp" class="muted">Loading…</div><div id="tor-status"></div></div><div class="score"><div class="muted" id="wc3-score-name">Current WC3</div><b id="wc3-score">—</b><div id="wc3-opp" class="muted">Loading…</div><div id="wc3-status"></div></div></div></div>
   <div class="card"><div class="sectiontitle"><h2>Race to WC3</h2><span class="muted" id="wc3-name">Loading…</span></div><div class="race"><div class="line"></div><div id="tor-dot" class="dot tor" style="left:20%"></div><div class="dot wc3" style="left:50%"></div></div><div class="racelabels"><span>Toronto</span><span>WC3 line</span></div><div class="callout" id="race-callout">Loading current race…</div><div class="muted" id="cle-note" style="margin-top:10px;font-size:12px"></div></div>
  </div>
 
@@ -29,49 +29,51 @@
 
  <div class="games section">
   <div class="card"><div class="sectiontitle"><h2>Toronto • last 14 days</h2><span class="muted" id="tor-form-label"></span></div><div id="tor-games" class="gamelist"></div></div>
-  <div class="card"><div class="sectiontitle"><h2>Cleveland • last 14 days</h2><span class="muted" id="cle-form-label"></span></div><div id="cle-games" class="gamelist"></div></div>
+  <div class="card"><div class="sectiontitle"><h2 id="wc3-recent-title">WC3 • last 14 days</h2><span class="muted" id="wc3-form-label"></span></div><div id="wc3-games" class="gamelist"></div></div>
  </div>
  <div class="footer">Live data: MLB Stats API • Refreshes every 60 seconds</div>
 </div>
 
 <script>
-const TOR=141,CLE=114,YEAR=2026,$=id=>document.getElementById(id);
+const TOR=141,YEAR=2026,$=id=>document.getElementById(id);
 function dateStr(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
 function state(g){const s=(g.status?.abstractGameState||g.status?.detailedState||"").toLowerCase();if(s.includes("final")||s.includes("completed"))return"Final";if(s.includes("live")||s.includes("progress"))return"Live";return"Scheduled"}
 function side(g,id){const h=g.teams.home.team.id===id,me=h?g.teams.home:g.teams.away,op=h?g.teams.away:g.teams.home;return{home:h,score:me.score??0,oppScore:op.score??0,opp:op.team.abbreviation||op.team.name,status:state(g)}}
 async function api(path){const r=await fetch("https://statsapi.mlb.com"+path,{cache:"no-store"});if(!r.ok)throw new Error("MLB request failed");return r.json()}
 async function schedule(id,start,end){const j=await api(`/api/v1/schedule?sportId=1&teamId=${id}&startDate=${start}&endDate=${end}&hydrate=team`);return(j.dates||[]).flatMap(d=>d.games.map(g=>({...g,day:d.date})))}
 async function standings(){const j=await api(`/api/v1/standings?leagueId=103&season=${YEAR}&standingsTypes=regularSeason`);return(j.records||[]).flatMap(r=>(r.teamRecords||[]).map(t=>({...t,division:r.division?.name||""})))}
-function gamesLeft(gs,today){return gs.filter(g=>g.day>today||(g.day===today&&state(g)!=="Final")).length}
 function gameToday(gs,today){return gs.find(g=>g.day===today&&state(g)==="Live")||gs.find(g=>g.day===today)}
 function renderScore(prefix,g,id){if(!g){$(`${prefix}-score`).textContent="—";$(`${prefix}-opp`).textContent="Off day";$(`${prefix}-status`).textContent="NO GAME";return}const x=side(g,id);$(`${prefix}-score`).textContent=x.score;$(`${prefix}-opp`).textContent=`${x.home?"vs":"@"} ${x.opp} • opp ${x.oppScore}`;const s=$(`${prefix}-status`);s.textContent=x.status.toUpperCase();s.className=x.status==="Live"?"live":"final"}
 function renderRecent(elId,gs,id,today){const el=$(elId);el.innerHTML="";let w=0,l=0;gs.filter(g=>g.day<=today).forEach(g=>{const x=side(g,id);if(x.status==="Final"){x.score>x.oppScore?w++:l++}const r=x.status==="Final"?(x.score>x.oppScore?"W":"L"):x.status,row=document.createElement("div");row.className="game";row.innerHTML=`<span class="muted">${new Date(g.day+"T12:00:00").toLocaleDateString(undefined,{month:"short",day:"numeric"})}</span><b>${x.home?"vs":"@"} ${x.opp}</b><span>${x.score}–${x.oppScore}</span><span class="${r==="W"?"win":r==="L"?"loss":""}">${r}</span>`;el.prepend(row)});return{w,l}}
-function renderStandings(recs,left){
- const rows=recs.map(r=>({id:r.team.id,name:r.team.name,w:r.wins,l:r.losses,pct:r.winningPercentage,leader:r.divisionLeader===true||r.divisionRank==="1",gb:r.gamesBack}));
- const eligible=rows.filter(x=>!x.leader).sort((a,b)=>(b.w/(b.w+b.l))-(a.w/(a.w+a.l)));
- const wc3=eligible[2],tor=rows.find(x=>x.id===TOR),cle=rows.find(x=>x.id===CLE);
- if(!tor||!cle||!wc3)throw new Error("Standings incomplete");
- const gap=x=>Math.max(0,((wc3.w-x.w)+(x.l-wc3.l))/2);
- $("tor-record").textContent=`${tor.w}–${tor.l}`;$("cle-record").textContent=`${cle.w}–${cle.l}`;$("tor-gb").textContent=gap(tor).toFixed(1);$("cle-div").textContent=cle.leader?"LEADER":`${cle.gb} GB`;
- $("wc3-name").textContent=`WC3: ${wc3.name}`;$("race-callout").innerHTML=gap(tor)===0?`Toronto is <strong>on or above the WC3 line</strong>.`:`Toronto is <strong>${gap(tor).toFixed(1)} games back</strong> of ${wc3.name} for WC3.`;
- $("tor-dot").style.left=Math.max(7,50-gap(tor)*9)+"%";$("cle-note").textContent=cle.leader?"Cleveland currently leads the AL Central, so it is not a Wild Card team.":"Cleveland is currently in the Wild Card field.";
- const body=$("wc-body");body.innerHTML="";eligible.slice(0,8).forEach((x,i)=>{const tr=document.createElement("tr");if(x.id===TOR)tr.classList.add("torrow");if(i===2)tr.classList.add("wc3row");const gb=gap(x);tr.innerHTML=`<td>${x.name}${i===2?" • WC3":""}</td><td>${x.w}</td><td>${x.l}</td><td>${x.pct}</td><td>${i<3?"—":gb.toFixed(1)}</td><td>${left[x.id]??Math.max(0,162-x.w-x.l)}</td>`;body.appendChild(tr)})
+function getRows(recs){return recs.map(r=>({id:r.team.id,name:r.team.name,abbr:r.team.abbreviation||r.team.name.slice(0,3).toUpperCase(),division:r.division,w:r.wins,l:r.losses,pct:r.winningPercentage,leader:r.divisionLeader===true||r.divisionRank==="1"}))}
+function getWC3(rows){const eligible=rows.filter(x=>!x.leader).sort((a,b)=>(b.w/(b.w+b.l))-(a.w/(a.w+a.l)));return{eligible,wc3:eligible[2]}}
+function gapFrom(wc3,x){return Math.max(0,((wc3.w-x.w)+(x.l-wc3.l))/2)}
+function renderStandings(rows,wc3,eligible){
+ const tor=rows.find(x=>x.id===TOR); if(!tor||!wc3)throw new Error("Standings incomplete");
+ const gap=gapFrom(wc3,tor);
+ $("tor-record").textContent=`${tor.w}–${tor.l}`;$("tor-gb").textContent=gap.toFixed(1);$("tor-left").textContent=Math.max(0,162-tor.w-tor.l);
+ $("wc3-badge").textContent=wc3.abbr;$("wc3-team").textContent=wc3.name;$("wc3-division").textContent=wc3.division||"American League";$("wc3-record").textContent=`${wc3.w}–${wc3.l}`;$("wc3-left").textContent=Math.max(0,162-wc3.w-wc3.l);
+ $("wc3-name").textContent=`WC3: ${wc3.name}`;$("race-callout").innerHTML=gap===0?`Toronto is <strong>on or above the WC3 line</strong>.`:`Toronto is <strong>${gap.toFixed(1)} games back</strong> of ${wc3.name} for WC3.`;
+ $("tor-dot").style.left=Math.max(7,50-gap*9)+"%";$("cle-note").textContent="The WC3 team updates automatically as the standings change.";
+ const body=$("wc-body");body.innerHTML="";eligible.slice(0,8).forEach((x,i)=>{const tr=document.createElement("tr");if(x.id===TOR)tr.classList.add("torrow");if(i===2)tr.classList.add("wc3row");const gb=gapFrom(wc3,x);tr.innerHTML=`<td>${x.name}${i===2?" • WC3":""}</td><td>${x.w}</td><td>${x.l}</td><td>${x.pct}</td><td>${i<3?"—":gb.toFixed(1)}</td><td>${Math.max(0,162-x.w-x.l)}</td>`;body.appendChild(tr)})
 }
 async function refresh(){
  $("refresh").disabled=true;$("error").style.display="none";
  try{
   const now=new Date(),today=dateStr(now),past=new Date(now),future=new Date(now);past.setDate(past.getDate()-13);future.setDate(future.getDate()+14);
-  const [torAll,cleAll,st]=await Promise.all([schedule(TOR,dateStr(past),dateStr(future)),schedule(CLE,dateStr(past),dateStr(future)),standings()]);
-  const tf=renderRecent("tor-games",torAll.filter(g=>g.day>=dateStr(past)),TOR,today),cf=renderRecent("cle-games",cleAll.filter(g=>g.day>=dateStr(past)),CLE,today);
-  $("tor-form").textContent=`${tf.w}–${tf.l}`;$("cle-form").textContent=`${cf.w}–${cf.l}`;$("tor-form-label").textContent=`${tf.w}–${tf.l} completed`;$("cle-form-label").textContent=`${cf.w}–${cf.l} completed`;
-  $("tor-left").textContent=gamesLeft(torAll,today);$("cle-left").textContent=gamesLeft(cleAll,today);
-  renderScore("tor",gameToday(torAll,today),TOR);renderScore("cle",gameToday(cleAll,today),CLE);
-  const left={[TOR]:gamesLeft(torAll,today),[CLE]:gamesLeft(cleAll,today)};renderStandings(st,left);
+  const st=await standings(),rows=getRows(st),{eligible,wc3}=getWC3(rows);
+  if(!wc3)throw new Error("WC3 unavailable");
+  const [torAll,wc3All]=await Promise.all([schedule(TOR,dateStr(past),dateStr(future)),schedule(wc3.id,dateStr(past),dateStr(future))]);
+  const tf=renderRecent("tor-games",torAll.filter(g=>g.day>=dateStr(past)),TOR,today),wf=renderRecent("wc3-games",wc3All.filter(g=>g.day>=dateStr(past)),wc3.id,today);
+  $("tor-form").textContent=`${tf.w}–${tf.l}`;$("wc3-form").textContent=`${wf.w}–${wf.l}`;$("tor-form-label").textContent=`${tf.w}–${tf.l} completed`;$("wc3-form-label").textContent=`${wf.w}–${wf.l} completed`;
+  $("wc3-score-name").textContent=wc3.name;$("wc3-recent-title").textContent=`${wc3.name} • last 14 days`;
+  renderScore("tor",gameToday(torAll,today),TOR);renderScore("wc3",gameToday(wc3All,today),wc3.id);
+  renderStandings(rows,wc3,eligible);
   $("updated").textContent="Updated "+new Date().toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});
  }catch(e){$("error").style.display="block";$("error").textContent="Live MLB data could not load. Tap Refresh now to try again.";$("updated").textContent="Live data unavailable";console.error(e)}
  finally{$("refresh").disabled=false}
 }
 $("refresh").onclick=refresh;refresh();setInterval(refresh,60000);
 </script>
-<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token":"2164014c981e45888b7146245bc0f04c"}'></script><!-- End Cloudflare Web Analytics -->
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "2164014c981e45888b7146245bc0f04c"}'></script><!-- End Cloudflare Web Analytics -->
 </body></html>
