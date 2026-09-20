@@ -3,286 +3,75 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Toronto Blue Jays — AL Wild Card Race</title>
+<title>Blue Jays Wild Card Tracker</title>
 <style>
-:root{
-  --bg:#07111f;--panel:#0d1b2e;--panel2:#12233a;--line:#203a59;
-  --text:#f7fbff;--muted:#9fb3c8;--jay:#1d5fd1;--jay2:#7db7ff;
-  --cle:#d43d4f;--cle2:#ff8795;--good:#38d996;--warn:#ffcc66;--bad:#ff6b78;
-}
-*{box-sizing:border-box}
-body{margin:0;background:linear-gradient(180deg,#06101c 0%,#0b1626 100%);color:var(--text);
-font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-.wrap{max-width:1180px;margin:0 auto;padding:24px}
-.top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px}
-.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#7ea0c2;font-weight:800}
-h1{margin:4px 0 6px;font-size:clamp(28px,4vw,48px);line-height:1.02}
-.sub{color:var(--muted);max-width:720px}
-.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
-button{border:1px solid #31506f;background:#10243b;color:#fff;padding:11px 15px;border-radius:12px;
-font-weight:800;cursor:pointer}
-button:hover{background:#16304f}
-.live-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--good);margin-right:7px;
-box-shadow:0 0 0 5px rgba(56,217,150,.12)}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.card{background:linear-gradient(180deg,rgba(18,35,58,.95),rgba(11,27,47,.95));border:1px solid var(--line);
-border-radius:20px;padding:20px}
-.teamcard{position:relative;overflow:hidden}
-.teamcard:after{content:"";position:absolute;inset:auto -60px -90px auto;width:220px;height:220px;border-radius:50%;
-opacity:.12;background:currentColor}
-.teamhead{display:flex;justify-content:space-between;gap:14px;align-items:center}
-.badge{width:58px;height:58px;border-radius:18px;display:grid;place-items:center;font-size:24px;font-weight:900;border:1px solid rgba(255,255,255,.15)}
-.jays .badge{background:rgba(29,95,209,.18);color:#9fc7ff}.guardians .badge{background:rgba(212,61,79,.18);color:#ff9baa}
-.teamname{font-size:21px;font-weight:900}
-.record{font-size:34px;font-weight:900;letter-spacing:-.04em}
-.meta{color:var(--muted);font-size:13px}
-.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
-.kpi{background:#0a1727;border:1px solid #1e3550;border-radius:14px;padding:12px}
-.kpi b{display:block;font-size:20px;margin-top:3px}
-.section{margin-top:16px}
-.sectiontitle{display:flex;align-items:end;justify-content:space-between;margin:0 0 10px}
-.sectiontitle h2{margin:0;font-size:20px}
-.scorebox{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px}
-.scoreteam{padding:14px;border-radius:16px;background:#091625;border:1px solid #213953}
-.scoreteam.right{text-align:right}
-.scorebig{font-size:46px;font-weight:900;line-height:1}
-.vs{text-align:center;color:#7e97b1;font-size:12px;font-weight:900}
-.status{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}
-.status.live{color:var(--good)} .status.final{color:#b8c7d6}
-.racebar{position:relative;height:34px;background:#081523;border-radius:999px;border:1px solid #26425e;overflow:hidden}
-.mid{position:absolute;left:50%;top:0;bottom:0;width:2px;background:#fff3;z-index:2}
-.marker{position:absolute;top:5px;width:24px;height:24px;border-radius:50%;transform:translateX(-50%);border:3px solid #06101c}
-.marker.j{background:var(--jay2)} .marker.c{background:var(--cle2)}
-.racelabels{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-top:7px}
-.callout{margin-top:12px;padding:14px 16px;border-radius:14px;background:#0a1727;border:1px solid #27425f}
-.callout strong{color:#fff}
-.wc-table{width:100%;border-collapse:collapse;font-size:14px}
-.wc-table th,.wc-table td{padding:11px 9px;border-bottom:1px solid #1b334c;text-align:right}
-.wc-table th:first-child,.wc-table td:first-child{text-align:left}
-.wc-table th{color:#8fa7bf;font-size:11px;text-transform:uppercase;letter-spacing:.08em}
-.highlight-j{background:rgba(29,95,209,.12)} .highlight-c{background:rgba(212,61,79,.10)}
-.games{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.game-list{display:flex;flex-direction:column;gap:8px}
-.game{display:grid;grid-template-columns:74px 1fr auto auto;align-items:center;gap:10px;padding:10px 12px;border:1px solid #1b334c;
-background:#091625;border-radius:12px}
-.game .date{color:#92a9bf;font-size:12px}.opp{font-weight:800}.res{font-weight:900}.win{color:var(--good)}.loss{color:var(--bad)}
-.note{font-size:12px;color:#89a3bd;margin-top:12px}
-.error{display:none;background:#3a1d26;border:1px solid #6a2b39;color:#ffd9df;padding:12px 14px;border-radius:12px;margin-bottom:14px}
-.footer{color:#7891aa;font-size:12px;text-align:center;margin:22px 0 8px}
-@media (max-width:820px){.grid2,.games{grid-template-columns:1fr}.top{flex-direction:column}.actions{justify-content:flex-start}.kpis{grid-template-columns:repeat(3,1fr)}}
-@media (max-width:520px){.wrap{padding:14px}.kpis{grid-template-columns:1fr}.scorebig{font-size:38px}.game{grid-template-columns:62px 1fr auto}}
+:root{--bg:#07111f;--panel:#10233a;--line:#29445f;--text:#f7fbff;--muted:#9fb3c8;--blue:#75adff;--red:#ff7b8a;--green:#45dda0;--gold:#ffd166}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(#06101c,#0b1727);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}.wrap{max-width:1100px;margin:auto;padding:18px}.top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.eyebrow{color:#7fa1c4;font-size:12px;font-weight:800;letter-spacing:.15em;text-transform:uppercase}h1{font-size:clamp(28px,5vw,48px);margin:5px 0}.sub,.muted{color:var(--muted)}button{background:#142b46;border:1px solid #365878;color:white;border-radius:12px;padding:11px 15px;font-weight:800}.statusline{font-size:13px;color:var(--muted);margin-top:8px}.error{display:none;margin:14px 0;padding:12px;border-radius:12px;background:#3b2028;border:1px solid #713745}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:16px}.card{background:linear-gradient(180deg,#122740,#0b1b2e);border:1px solid var(--line);border-radius:19px;padding:18px}.teamhead{display:flex;justify-content:space-between;align-items:center;gap:12px}.badge{width:58px;height:58px;border-radius:17px;display:grid;place-items:center;font-weight:900;font-size:22px;background:#0b192a;border:1px solid #36516c}.team{font-size:20px;font-weight:900}.record{font-size:32px;font-weight:900}.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:15px}.kpi{padding:11px;background:#091827;border:1px solid #213b55;border-radius:13px}.kpi b{display:block;font-size:20px;margin-top:4px}.section{margin-top:15px}.sectiontitle{display:flex;justify-content:space-between;align-items:end;gap:10px;margin-bottom:10px}.sectiontitle h2{font-size:20px;margin:0}.scoregrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.score{background:#091827;border:1px solid #213b55;border-radius:14px;padding:13px}.score b{font-size:31px}.live{color:var(--green);font-weight:900}.final{color:#c4d0dc;font-weight:900}.race{height:28px;background:#081522;border:1px solid #2b4865;border-radius:99px;position:relative;margin-top:15px}.line{position:absolute;left:50%;top:0;bottom:0;width:2px;background:#ffffff55}.dot{position:absolute;top:3px;width:20px;height:20px;border-radius:50%;transform:translateX(-50%);border:3px solid #06101c}.tor{background:var(--blue)}.wc3{background:var(--gold)}.racelabels{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-top:6px}.callout{margin-top:12px;background:#091827;border:1px solid #29445f;border-radius:13px;padding:13px}table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:10px 8px;border-bottom:1px solid #203a53;text-align:right}th:first-child,td:first-child{text-align:left}th{font-size:11px;color:#91a9c1;text-transform:uppercase}.torrow{background:#163a652f}.wc3row{box-shadow:inset 3px 0 var(--gold)}.games{display:grid;grid-template-columns:1fr 1fr;gap:15px}.gamelist{display:flex;flex-direction:column;gap:7px}.game{display:grid;grid-template-columns:62px 1fr auto auto;gap:8px;align-items:center;background:#091827;border:1px solid #203a53;border-radius:11px;padding:9px}.win{color:var(--green);font-weight:900}.loss{color:var(--red);font-weight:900}.footer{text-align:center;color:#748ea8;font-size:12px;margin:22px 0}.loading{text-align:center;color:var(--muted);padding:18px}
+@media(max-width:760px){.top,.grid2,.games{display:block}.top button{margin-top:12px}.card{margin-top:12px}.kpis{grid-template-columns:repeat(3,1fr)}}@media(max-width:480px){.wrap{padding:12px}.kpis{grid-template-columns:1fr}.game{grid-template-columns:55px 1fr auto}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="top">
-    <div>
-      <div class="eyebrow">American League • Wild Card Watch</div>
-      <h1>Toronto Blue Jays • Wild Card Race</h1>
-      <div class="sub">Toronto’s live race to the final American League Wild Card spot. The WC3 target updates automatically as the standings change.</div>
-    </div>
-    <div class="actions">
-      <div class="meta"><span class="live-dot"></span><span id="updated">Loading live data…</span></div>
-      <button id="refresh">Refresh now</button>
-    </div>
-  </div>
+ <div class="top"><div><div class="eyebrow">American League • Wild Card Watch</div><h1>Blue Jays Wild Card Tracker</h1><div class="sub">Live Toronto playoff race, with Cleveland tracked separately.</div><div class="statusline" id="updated">Loading MLB data…</div></div><button id="refresh">Refresh now</button></div>
+ <div id="error" class="error"></div>
 
-  <div id="error" class="error"></div>
+ <div class="grid2">
+  <div class="card"><div class="teamhead"><div><div class="badge">TOR</div><div class="team">Toronto Blue Jays</div><div class="muted">AL East</div></div><div class="record" id="tor-record">—</div></div><div class="kpis"><div class="kpi"><span class="muted">WC3 GB</span><b id="tor-gb">—</b></div><div class="kpi"><span class="muted">Games left</span><b id="tor-left">—</b></div><div class="kpi"><span class="muted">Last 14 days</span><b id="tor-form">—</b></div></div></div>
+  <div class="card"><div class="teamhead"><div><div class="badge">CLE</div><div class="team">Cleveland Guardians</div><div class="muted">AL Central</div></div><div class="record" id="cle-record">—</div></div><div class="kpis"><div class="kpi"><span class="muted">Division status</span><b id="cle-div">—</b></div><div class="kpi"><span class="muted">Games left</span><b id="cle-left">—</b></div><div class="kpi"><span class="muted">Last 14 days</span><b id="cle-form">—</b></div></div></div>
+ </div>
 
-  <div class="grid2">
-    <div class="card teamcard jays">
-      <div class="teamhead">
-        <div style="display:flex;gap:13px;align-items:center">
-          <div class="badge">TOR</div>
-          <div><div class="teamname">Toronto Blue Jays</div><div class="meta">AL East</div></div>
-        </div>
-        <div class="record" id="tor-record">73–75</div>
-      </div>
-      <div class="kpis">
-        <div class="kpi"><span class="meta">Wild Card GB</span><b id="tor-gb">1.5</b></div>
-        <div class="kpi"><span class="meta">Games left</span><b id="tor-left">14</b></div>
-        <div class="kpi"><span class="meta">Last 14 days</span><b id="tor-form">6–5</b></div>
-      </div>
-    </div>
+ <div class="grid2">
+  <div class="card"><div class="sectiontitle"><h2>Today</h2><span class="muted">live / final</span></div><div class="scoregrid"><div class="score"><div class="muted">Toronto</div><b id="tor-score">—</b><div id="tor-opp" class="muted">Loading…</div><div id="tor-status"></div></div><div class="score"><div class="muted">Cleveland</div><b id="cle-score">—</b><div id="cle-opp" class="muted">Loading…</div><div id="cle-status"></div></div></div></div>
+  <div class="card"><div class="sectiontitle"><h2>Race to WC3</h2><span class="muted" id="wc3-name">Loading…</span></div><div class="race"><div class="line"></div><div id="tor-dot" class="dot tor" style="left:20%"></div><div class="dot wc3" style="left:50%"></div></div><div class="racelabels"><span>Toronto</span><span>WC3 line</span></div><div class="callout" id="race-callout">Loading current race…</div><div class="muted" id="cle-note" style="margin-top:10px;font-size:12px"></div></div>
+ </div>
 
-    <div class="card teamcard guardians">
-      <div class="teamhead">
-        <div style="display:flex;gap:13px;align-items:center">
-          <div class="badge">CLE</div>
-          <div><div class="teamname">Cleveland Guardians</div><div class="meta">AL Central</div></div>
-        </div>
-        <div class="record" id="cle-record">74–73</div>
-      </div>
-      <div class="kpis">
-        <div class="kpi"><span class="meta">Wild Card GB</span><b id="cle-gb">0.0</b></div>
-        <div class="kpi"><span class="meta">Games left</span><b id="cle-left">15</b></div>
-        <div class="kpi"><span class="meta">Last 14 days</span><b id="cle-form">7–5</b></div>
-      </div>
-    </div>
-  </div>
+ <div class="card section"><div class="sectiontitle"><h2>American League Wild Card</h2><span class="muted">division leaders excluded</span></div><div style="overflow-x:auto"><table><thead><tr><th>Team</th><th>W</th><th>L</th><th>PCT</th><th>WCGB</th><th>Left</th></tr></thead><tbody id="wc-body"><tr><td colspan="6" class="loading">Loading live standings…</td></tr></tbody></table></div></div>
 
-  <div class="section grid2">
-    <div class="card">
-      <div class="sectiontitle"><h2>Today’s scoreboard</h2><span class="meta">live / final</span></div>
-      <div class="scorebox">
-        <div class="scoreteam">
-          <div class="meta">Toronto</div>
-          <div class="scorebig" id="tor-score">6</div>
-          <div id="tor-opp" class="meta">vs BAL</div>
-        </div>
-        <div class="vs">
-          <div id="tor-status" class="status live">LIVE</div>
-          <div style="margin:8px 0;color:#4f6c88">•</div>
-          <div id="cle-status" class="status live">LIVE</div>
-        </div>
-        <div class="scoreteam right">
-          <div class="meta">Cleveland</div>
-          <div class="scorebig" id="cle-score">2</div>
-          <div id="cle-opp" class="meta">@ MIN</div>
-        </div>
-      </div>
-      <div class="note" id="score-note">Opponent scores: BAL 3 • MIN 4</div>
-    </div>
-
-    <div class="card">
-      <div class="sectiontitle"><h2>Race to WC3</h2><span class="meta" id="wc3-meta">live target</span></div>
-      <div class="racebar">
-        <div class="mid"></div>
-        <div class="marker j" id="tor-marker" style="left:35%"></div>
-        <div class="marker c" id="cle-marker" style="left:50%"></div>
-      </div>
-      <div class="racelabels"><span>Toronto</span><span>WC3 line</span><span id="wc3-label">Current WC3</span></div>
-      <div class="callout" id="race-callout">
-        Loading the current WC3 race…
-      </div>
-      <div class="note" id="race-note">WC3 follows the actual third American League Wild Card team automatically. Cleveland remains shown separately.</div>
-    </div>
-  </div>
-
-  <div class="section card">
-    <div class="sectiontitle"><h2>American League Wild Card race</h2><span class="meta">relevant contenders</span></div>
-    <div style="overflow-x:auto">
-      <table class="wc-table">
-        <thead><tr><th>Team</th><th>W</th><th>L</th><th>PCT</th><th>WCGB</th><th>Left</th></tr></thead>
-        <tbody id="wc-body">
-          <tr><td>New York Yankees</td><td>85</td><td>62</td><td>.578</td><td>—</td><td>15</td></tr>
-          <tr><td>Boston Red Sox</td><td>80</td><td>68</td><td>.541</td><td>—</td><td>14</td></tr>
-          <tr class="highlight-c"><td>Cleveland Guardians</td><td>74</td><td>73</td><td>.503</td><td>0.0</td><td>15</td></tr>
-          <tr class="highlight-j"><td>Toronto Blue Jays</td><td>73</td><td>75</td><td>.493</td><td>1.5</td><td>14</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="section games">
-    <div class="card">
-      <div class="sectiontitle"><h2>Toronto • last 14 days</h2><span class="meta" id="tor-form-label">6–5 completed</span></div>
-      <div class="game-list" id="tor-games"></div>
-    </div>
-    <div class="card">
-      <div class="sectiontitle"><h2>Cleveland • last 14 days</h2><span class="meta" id="cle-form-label">7–5 completed</span></div>
-      <div class="game-list" id="cle-games"></div>
-    </div>
-  </div>
-
-  <div class="footer">Live data is pulled from MLB Stats API. Internet connection required for refresh.</div>
+ <div class="games section">
+  <div class="card"><div class="sectiontitle"><h2>Toronto • last 14 days</h2><span class="muted" id="tor-form-label"></span></div><div id="tor-games" class="gamelist"></div></div>
+  <div class="card"><div class="sectiontitle"><h2>Cleveland • last 14 days</h2><span class="muted" id="cle-form-label"></span></div><div id="cle-games" class="gamelist"></div></div>
+ </div>
+ <div class="footer">Live data: MLB Stats API • Refreshes every 60 seconds</div>
 </div>
 
 <script>
-const TOR=141, CLE=114, YEAR=2026;
-const fallback = {
-  tor:{w:73,l:75,gb:1.5,score:6,oppScore:3,opp:"BAL",status:"Live"},
-  cle:{w:74,l:73,gb:0,score:2,oppScore:4,opp:"MIN",status:"Live"}
-};
-const $=id=>document.getElementById(id);
-function fmtDate(d){return d.toISOString().slice(0,10)}
-function shortDate(s){const d=new Date(s+"T12:00:00");return d.toLocaleDateString(undefined,{month:"short",day:"numeric"})}
-function pct(w,l){return (w/(w+l)).toFixed(3).replace(/^0/,"")}
-function stateLabel(g){
-  const s=(g.status?.detailedState||g.status?.abstractGameState||"").toLowerCase();
-  if(s.includes("final")||s.includes("completed")) return "Final";
-  if(s.includes("live")||s.includes("progress")) return "Live";
-  return g.status?.detailedState||"Scheduled";
-}
-function teamSide(g,teamId){
-  const home=g.teams.home.team.id===teamId;
-  const me=home?g.teams.home:g.teams.away, opp=home?g.teams.away:g.teams.home;
-  return {home,score:me.score??0,oppScore:opp.score??0,opp:opp.team.abbreviation||opp.team.name,status:stateLabel(g)};
-}
-async function api(path){const r=await fetch("https://statsapi.mlb.com"+path,{cache:"no-store"});if(!r.ok)throw new Error("MLB data unavailable");return r.json()}
-async function schedules(teamId,start,end){
-  const j=await api(`/api/v1/schedule?sportId=1&teamId=${teamId}&startDate=${start}&endDate=${end}&hydrate=team`);
-  return j.dates.flatMap(d=>d.games.map(g=>({...g,gameDateOnly:d.date})));
-}
-async function standings(){
-  const j=await api(`/api/v1/standings?leagueId=103&season=${YEAR}&standingsTypes=wildCard`);
-  return j.records?.flatMap(r=>r.teamRecords||[])||[];
-}
-function renderGames(id,games,teamId){
-  const el=$(id); el.innerHTML="";
-  let w=0,l=0;
-  games.slice().reverse().forEach(g=>{
-    const t=teamSide(g,teamId), final=t.status==="Final";
-    if(final){if(t.score>t.oppScore)w++; else l++;}
-    const row=document.createElement("div");row.className="game";
-    const result=final?(t.score>t.oppScore?"W":"L"):t.status;
-    row.innerHTML=`<div class="date">${shortDate(g.gameDateOnly)}</div>
-      <div class="opp">${t.home?"vs":"@"} ${t.opp}</div>
-      <div>${t.score}–${t.oppScore}</div>
-      <div class="res ${result==="W"?"win":result==="L"?"loss":""}">${result}</div>`;
-    el.appendChild(row);
-  });
-  return {w,l};
-}
-function setScore(prefix,g,teamId){
-  if(!g)return;
-  const t=teamSide(g,teamId);
-  $(`${prefix}-score`).textContent=t.score;
-  $(`${prefix}-opp`).textContent=`${t.home?"vs":"@"} ${t.opp}`;
-  const st=$(`${prefix}-status`);st.textContent=t.status.toUpperCase();st.className="status "+(t.status==="Live"?"live":"final");
-  return t;
-}
-function currentGame(games){
-  return games.find(g=>stateLabel(g)==="Live") || games.find(g=>g.gameDateOnly===fmtDate(new Date()));
-}
-function renderStandings(recs){
-  if(!recs.length)return;
-  const rows=recs.map(r=>({id:r.team.id,name:r.team.name,w:r.wins,l:r.losses,pct:r.winningPercentage||pct(r.wins,r.losses),gb:r.wildCardGamesBack??r.gamesBack??"-",rank:parseInt(r.wildCardRank||"999",10),divisionLeader:r.divisionLeader===true,left:162-r.wins-r.losses}));
-  const tor=rows.find(x=>x.id===TOR), cle=rows.find(x=>x.id===CLE);
-  const eligible=rows.filter(x=>!x.divisionLeader).sort((a,b)=>(a.rank-b.rank)||((b.w/(b.w+b.l))-(a.w/(a.w+a.l))));
-  const wc3=eligible.find(x=>x.rank===3)||eligible[2];
-  if(tor){$("tor-record").textContent=`${tor.w}–${tor.l}`;$("tor-gb").textContent=tor.gb;$("tor-left").textContent=tor.left}
-  if(cle){$("cle-record").textContent=`${cle.w}–${cle.l}`;$("cle-gb").textContent=cle.divisionLeader?"DIV LEAD":cle.gb;$("cle-left").textContent=cle.left}
-  const body=$("wc-body");body.innerHTML="";
-  eligible.slice(0,9).forEach(x=>{const tr=document.createElement("tr");if(x.id===TOR)tr.className="highlight-j";if(x.id===CLE)tr.className="highlight-c";tr.innerHTML=`<td>${x.name}${wc3&&x.id===wc3.id?" • WC3":""}</td><td>${x.w}</td><td>${x.l}</td><td>${x.pct}</td><td>${x.gb}</td><td>${x.left}</td>`;body.appendChild(tr)});
-  if(tor&&wc3){const gap=Math.max(0,parseFloat(tor.gb)||0),pos=Math.max(8,Math.min(50,50-gap*9));$("tor-marker").style.left=pos+"%";$("cle-marker").style.left="50%";$("wc3-label").textContent=wc3.name;$("wc3-meta").textContent=`WC3: ${wc3.name}`;$("race-callout").innerHTML=tor.id===wc3.id||gap===0?`Toronto is <strong>on the WC3 line</strong>. Current WC3: <strong>${wc3.name}</strong>.`:`Toronto is <strong>${gap.toFixed(1)} game${gap===1?"":"s"} back of WC3</strong>. Current target: <strong>${wc3.name}</strong>.`;}
-  if(cle)$("race-note").textContent=cle.divisionLeader?"Cleveland currently leads the AL Central, so it is not the WC3 target. This tracker will adjust automatically if that changes.":"Cleveland is currently in the Wild Card field. WC3 above follows MLB’s live standings automatically.";
+const TOR=141,CLE=114,YEAR=2026,$=id=>document.getElementById(id);
+function dateStr(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
+function state(g){const s=(g.status?.abstractGameState||g.status?.detailedState||"").toLowerCase();if(s.includes("final")||s.includes("completed"))return"Final";if(s.includes("live")||s.includes("progress"))return"Live";return"Scheduled"}
+function side(g,id){const h=g.teams.home.team.id===id,me=h?g.teams.home:g.teams.away,op=h?g.teams.away:g.teams.home;return{home:h,score:me.score??0,oppScore:op.score??0,opp:op.team.abbreviation||op.team.name,status:state(g)}}
+async function api(path){const r=await fetch("https://statsapi.mlb.com"+path,{cache:"no-store"});if(!r.ok)throw new Error("MLB request failed");return r.json()}
+async function schedule(id,start,end){const j=await api(`/api/v1/schedule?sportId=1&teamId=${id}&startDate=${start}&endDate=${end}&hydrate=team`);return(j.dates||[]).flatMap(d=>d.games.map(g=>({...g,day:d.date})))}
+async function standings(){const j=await api(`/api/v1/standings?leagueId=103&season=${YEAR}&standingsTypes=regularSeason`);return(j.records||[]).flatMap(r=>(r.teamRecords||[]).map(t=>({...t,division:r.division?.name||""})))}
+function gamesLeft(gs,today){return gs.filter(g=>g.day>today||(g.day===today&&state(g)!=="Final")).length}
+function gameToday(gs,today){return gs.find(g=>g.day===today&&state(g)==="Live")||gs.find(g=>g.day===today)}
+function renderScore(prefix,g,id){if(!g){$(`${prefix}-score`).textContent="—";$(`${prefix}-opp`).textContent="Off day";$(`${prefix}-status`).textContent="NO GAME";return}const x=side(g,id);$(`${prefix}-score`).textContent=x.score;$(`${prefix}-opp`).textContent=`${x.home?"vs":"@"} ${x.opp} • opp ${x.oppScore}`;const s=$(`${prefix}-status`);s.textContent=x.status.toUpperCase();s.className=x.status==="Live"?"live":"final"}
+function renderRecent(elId,gs,id,today){const el=$(elId);el.innerHTML="";let w=0,l=0;gs.filter(g=>g.day<=today).forEach(g=>{const x=side(g,id);if(x.status==="Final"){x.score>x.oppScore?w++:l++}const r=x.status==="Final"?(x.score>x.oppScore?"W":"L"):x.status,row=document.createElement("div");row.className="game";row.innerHTML=`<span class="muted">${new Date(g.day+"T12:00:00").toLocaleDateString(undefined,{month:"short",day:"numeric"})}</span><b>${x.home?"vs":"@"} ${x.opp}</b><span>${x.score}–${x.oppScore}</span><span class="${r==="W"?"win":r==="L"?"loss":""}">${r}</span>`;el.prepend(row)});return{w,l}}
+function renderStandings(recs,left){
+ const rows=recs.map(r=>({id:r.team.id,name:r.team.name,w:r.wins,l:r.losses,pct:r.winningPercentage,leader:r.divisionLeader===true||r.divisionRank==="1",gb:r.gamesBack}));
+ const eligible=rows.filter(x=>!x.leader).sort((a,b)=>(b.w/(b.w+b.l))-(a.w/(a.w+a.l)));
+ const wc3=eligible[2],tor=rows.find(x=>x.id===TOR),cle=rows.find(x=>x.id===CLE);
+ if(!tor||!cle||!wc3)throw new Error("Standings incomplete");
+ const gap=x=>Math.max(0,((wc3.w-x.w)+(x.l-wc3.l))/2);
+ $("tor-record").textContent=`${tor.w}–${tor.l}`;$("cle-record").textContent=`${cle.w}–${cle.l}`;$("tor-gb").textContent=gap(tor).toFixed(1);$("cle-div").textContent=cle.leader?"LEADER":`${cle.gb} GB`;
+ $("wc3-name").textContent=`WC3: ${wc3.name}`;$("race-callout").innerHTML=gap(tor)===0?`Toronto is <strong>on or above the WC3 line</strong>.`:`Toronto is <strong>${gap(tor).toFixed(1)} games back</strong> of ${wc3.name} for WC3.`;
+ $("tor-dot").style.left=Math.max(7,50-gap(tor)*9)+"%";$("cle-note").textContent=cle.leader?"Cleveland currently leads the AL Central, so it is not a Wild Card team.":"Cleveland is currently in the Wild Card field.";
+ const body=$("wc-body");body.innerHTML="";eligible.slice(0,8).forEach((x,i)=>{const tr=document.createElement("tr");if(x.id===TOR)tr.classList.add("torrow");if(i===2)tr.classList.add("wc3row");const gb=gap(x);tr.innerHTML=`<td>${x.name}${i===2?" • WC3":""}</td><td>${x.w}</td><td>${x.l}</td><td>${x.pct}</td><td>${i<3?"—":gb.toFixed(1)}</td><td>${left[x.id]??Math.max(0,162-x.w-x.l)}</td>`;body.appendChild(tr)})
 }
 async function refresh(){
-  $("error").style.display="none"; $("refresh").disabled=true; $("refresh").textContent="Refreshing…";
-  try{
-    const now=new Date(), start=new Date(now); start.setDate(start.getDate()-13);
-    const [tg,cg,st]=await Promise.all([schedules(TOR,fmtDate(start),fmtDate(now)),schedules(CLE,fmtDate(start),fmtDate(now)),standings()]);
-    const tf=renderGames("tor-games",tg,TOR), cf=renderGames("cle-games",cg,CLE);
-    $("tor-form").textContent=`${tf.w}–${tf.l}`;$("cle-form").textContent=`${cf.w}–${cf.l}`;
-    $("tor-form-label").textContent=`${tf.w}–${tf.l} completed`;$("cle-form-label").textContent=`${cf.w}–${cf.l} completed`;
-    const t=setScore("tor",currentGame(tg),TOR), c=setScore("cle",currentGame(cg),CLE);
-    if(t&&c)$("score-note").textContent=`Opponent scores: ${t.opp} ${t.oppScore} • ${c.opp} ${c.oppScore}`;
-    renderStandings(st);
-    $("updated").textContent="Updated "+new Date().toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});
-  }catch(e){
-    $("error").style.display="block";
-    $("error").textContent="Live refresh could not reach MLB right now. Showing the most recent saved snapshot.";
-    $("updated").textContent="Snapshot mode";
-  }finally{
-    $("refresh").disabled=false;$("refresh").textContent="Refresh now";
-  }
+ $("refresh").disabled=true;$("error").style.display="none";
+ try{
+  const now=new Date(),today=dateStr(now),past=new Date(now),future=new Date(now);past.setDate(past.getDate()-13);future.setDate(future.getDate()+14);
+  const [torAll,cleAll,st]=await Promise.all([schedule(TOR,dateStr(past),dateStr(future)),schedule(CLE,dateStr(past),dateStr(future)),standings()]);
+  const tf=renderRecent("tor-games",torAll.filter(g=>g.day>=dateStr(past)),TOR,today),cf=renderRecent("cle-games",cleAll.filter(g=>g.day>=dateStr(past)),CLE,today);
+  $("tor-form").textContent=`${tf.w}–${tf.l}`;$("cle-form").textContent=`${cf.w}–${cf.l}`;$("tor-form-label").textContent=`${tf.w}–${tf.l} completed`;$("cle-form-label").textContent=`${cf.w}–${cf.l} completed`;
+  $("tor-left").textContent=gamesLeft(torAll,today);$("cle-left").textContent=gamesLeft(cleAll,today);
+  renderScore("tor",gameToday(torAll,today),TOR);renderScore("cle",gameToday(cleAll,today),CLE);
+  const left={[TOR]:gamesLeft(torAll,today),[CLE]:gamesLeft(cleAll,today)};renderStandings(st,left);
+  $("updated").textContent="Updated "+new Date().toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});
+ }catch(e){$("error").style.display="block";$("error").textContent="Live MLB data could not load. Tap Refresh now to try again.";$("updated").textContent="Live data unavailable";console.error(e)}
+ finally{$("refresh").disabled=false}
 }
-$("refresh").addEventListener("click",refresh);
-refresh();
-setInterval(refresh,60000);
+$("refresh").onclick=refresh;refresh();setInterval(refresh,60000);
 </script>
-  <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "2164014c981e45888b7146245bc0f04c"}'></script><!-- End Cloudflare Web Analytics -->
-
-</body>
-</html>
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token":"2164014c981e45888b7146245bc0f04c"}'></script><!-- End Cloudflare Web Analytics -->
+</body></html>
